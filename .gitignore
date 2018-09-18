@@ -108,5 +108,6 @@ ENV/
 *.npz
 
 # other stuff
+.ipynb_checkpoints
 .DS_Store
 .idea/
