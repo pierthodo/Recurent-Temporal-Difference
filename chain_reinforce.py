@@ -90,9 +90,9 @@ def main(chain_len, num_expt):
     num_actions = env.action_space.n
 
     policy = Policy(num_obs, 1)
-    optimizer = optim.SGD(policy.parameters(), lr=1e-1)
+    optimizer = optim.SGD(policy.parameters(), lr=1e-2)
 
-    num_episodes = 500
+    num_episodes = 1000
     runs_ = []
     a_prob = []
     
@@ -108,15 +108,20 @@ def main(chain_len, num_expt):
 
 
 if __name__ == '__main__':
+
+    pkl_output_rew = []
+    pkl_output_probs = []
     for c in range(3, 31):
         print(c)
         chain_len = c
         num_expt = 10
         
         runs_rew, probs = main(chain_len, num_expt)
+        pkl_output_rew.append(runs_rew)
+        pkl_output_probs.append(probs)
 
-        with open('reinforce_outputs/reinforce_vanilla_chain_'+str(chain_len)+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
-            pickle.dump(runs_rew, f)
+    with open('reinforce_outputs/reinforce_vanilla_'+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
+        pickle.dump(pkl_output_rew, f)
 
-        with open('reinforce_outputs/reinforce_vanilla_chain_probs_'+str(chain_len)+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
-            pickle.dump(probs, f)
+    with open('reinforce_outputs/reinforce_vanilla_probs'+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
+        pickle.dump(pkl_output_probs, f)

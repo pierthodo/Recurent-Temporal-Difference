@@ -57,7 +57,7 @@ def finish_episode(policy, optimizer):
         policy_loss.append(-log_prob * reward)
     optimizer.zero_grad()
     policy_loss = torch.cat(policy_loss).sum()
-    policy_loss.backward(retain_graph = True)
+    policy_loss.backward()
     '''
     print("printing Gradient")
     for param in policy.parameters():
@@ -83,7 +83,7 @@ def experiment(env, num_episodes, policy, optimizer, num_obs, beta):
         begin = True
         epi_reward = 0
         while not done:
-            action, prev_prob = select_action(beta_state, prev_prob, state, False, policy)
+            action, prev_prob = select_action(beta_state, prev_prob, state, begin, policy)
             next_state, reward, done, _ = env.step(action)
             next_state = encode(next_state, num_obs)
             policy.rewards.append(reward)
@@ -107,9 +107,9 @@ def main(chain_len, num_expt):
     beta[0] = 1
 
     policy = Policy(num_obs, 1)
-    optimizer = optim.SGD(policy.parameters(), lr=1e-1)
+    optimizer = optim.SGD(policy.parameters(), lr=1e-2)
 
-    num_episodes = 500
+    num_episodes = 1000
     runs_ = []
     a_prob = []
     
@@ -126,15 +126,21 @@ def main(chain_len, num_expt):
 
 
 if __name__ == '__main__':
+
+    pkl_output_rew = []
+    pkl_output_probs = []
+
     for c in range(3, 31):
         print(c)
         chain_len = c
         num_expt = 10
 
         runs_rew, probs = main(chain_len, num_expt)
+        pkl_output_rew.append(runs_rew)
+        pkl_output_probs.append(probs)
 
-        with open('reinforce_RTD_outputs/reinforce_RTD_chain_'+str(chain_len)+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
-            pickle.dump(runs_rew, f)
+    with open('reinforce_RTD_outputs/reinforce_RTD_'+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
+        pickle.dump(pkl_output_rew, f)
 
-        with open('reinforce_RTD_outputs/reinforce_RTD_chain_probs_'+str(chain_len)+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
-            pickle.dump(probs, f)
+    with open('reinforce_RTD_outputs/reinforce_RTD_probs_'+'_expt_'+str(num_expt)+'_rewards_.pkl', 'wb') as f:
+        pickle.dump(pkl_output_probs, f)
